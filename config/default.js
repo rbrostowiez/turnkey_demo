@@ -1,12 +1,12 @@
 module.exports = {
-  listingsPerPage: 300,
+  listingsPerPage: 18,
   targetUrl: "https://www.airbnb.com/s/Austin--TX--United-States/homes?refinements%5B%5D=homes&in_see_all=true&allow_override%5B%5D=&s_tag=QkGJ9fp6",
   sessionOptions: {
     baseUrl: "https://www.airbnb.com/api/v2/explore_tabs",
     defaultParameters: {
       _format: "for_explore_search_web",
       experiences_per_grid: "20",
-      items_per_grid: "300",
+      items_per_grid: "18",
       guidebooks_per_grid: "20",
       auto_ib: "true",
       fetch_filters: "true",
