@@ -2,6 +2,6 @@ const Scraper = require('./app/scraper');
 
 //TODO: Logger
 
-console.log('Beginnning web-scraper...');
+console.log('Beginning web-scraper...');
 
 Scraper.run();
