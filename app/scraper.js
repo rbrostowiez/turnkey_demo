@@ -37,19 +37,19 @@ class Scraper {
     static getListings(sessionData) {
         console.log("Getting listings");
         let urlParams = Object.assign({key: sessionData.api_config.key}, config.sessionOptions.defaultParameters);
-        let url = config.sessionOptions.baseUrl + "?" + Object.keys(urlParams).map(key => `${key}=${urlParams[key]}`).join("&");
+        let firstUrl = config.sessionOptions.baseUrl + "?" + Object.keys(urlParams).map(key => `${key}=${urlParams[key]}`).join("&");
         //Priming with initial request, then populate an array of remaining result-requests
-        return needle('get', url).then(res =>{
+        return needle('get', firstUrl).then(res =>{
             let pageCount = Math.ceil(res.body.explore_tabs[0].home_tab_metadata.listings_count / config.listingsPerPage);
-            let promises = [res.body.explore_tabs[0].sections[0].listings];
+            let initialResults = res.body.explore_tabs[0].sections[0].listings;
+            let urls = [];
             console.log(`Performing the ${pageCount -1} remaining requests to retrieve: ${res.body.explore_tabs[0].home_tab_metadata.listings_count} results!`);
             for(let i = 1; i < pageCount; i++){
                 urlParams.section_offset = i;
-                url = config.sessionOptions.baseUrl + "?" + Object.keys(urlParams).map(key => `${key}=${urlParams[key]}`).join("&");
-                promises.push(needle('get', url).then(result => result.body.explore_tabs[0].sections[0].listings));
+                urls.push(config.sessionOptions.baseUrl + "?" + Object.keys(urlParams).map(key => `${key}=${urlParams[key]}`).join("&"));
             }
-            //Wait for all promises to resolve, concat results into a single array, then return
-            return Promise.all(promises).then(results => Array.prototype.concat.apply([], results));
+            //Trigger a fetch for each URL then concat to the first result set
+            return Promise.resolve(urls).map(url => needle('get', url).then(result => result.body.explore_tabs[0].sections[0].listings), {concurrency: 2}).then(results => Array.prototype.concat.apply(initialResults, results));
         });
     }
 
